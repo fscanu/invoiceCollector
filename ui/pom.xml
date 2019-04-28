@@ -4,6 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ui-model</artifactId>
-    <groupId>com.fescacomit</groupId>
     <version>0.0.1.SNAPSHOT</version>
+
+    <parent>
+        <groupId>com.fescacomit</groupId>
+        <artifactId>invoiceCollector</artifactId>
+        <version>0.0.1.SNAPSHOT</version>
+    </parent>
 </project>

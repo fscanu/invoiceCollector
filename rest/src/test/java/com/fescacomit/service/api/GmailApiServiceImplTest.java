@@ -7,7 +7,6 @@ import com.fescacomit.service.gmail.utilties.Utilities;
 import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.*;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,7 +19,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -40,16 +38,6 @@ public class GmailApiServiceImplTest {
     private Gmail               gmailService;
     @Mock
     private GmailMessageService gmailMessageService;
-
-    @Before
-    public void initializeTest() {
-        try {
-            doNothing().when(utilities).downloadAttachment(isA(String.class), isA(String.class));
-        } catch (DownloadException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     @Test(expected = LinkNotFoundException.class)
     public void getAttachmentByLinkText_with_message_without_link() throws LinkNotFoundException, DownloadException {
@@ -84,20 +72,23 @@ public class GmailApiServiceImplTest {
     }
 
     @Test
-    public void getAttachmentByLinkText_with_full_message_link_match()
-            throws LinkNotFoundException, DownloadException {
+    public void getAttachmentByLinkText_with_full_message_link_match() {
         //given a message with a valid link inside
         doReturn(getMessageWithLink()).when(gmailMessageService).getMessage(gmailService, USER_ID, MESSAGE_ID);
 
         //then i will expect a LinkNotFoundException
-        gmailApiService.getAttachmentByLinkText(
-                gmailService,
-                gmailMessageService,
-                utilities,
-                "Consultez ici votre aperçu",
-                TEST_LABEL,
-                USER_ID,
-                MESSAGE_ID, MONTH_OFFSET);
+        try {
+            gmailApiService.getAttachmentByLinkText(
+                    gmailService,
+                    gmailMessageService,
+                    utilities,
+                    "Consultez ici votre aperçu",
+                    TEST_LABEL,
+                    USER_ID,
+                    MESSAGE_ID, MONTH_OFFSET);
+        } catch (LinkNotFoundException | DownloadException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test(expected = java.lang.NullPointerException.class)

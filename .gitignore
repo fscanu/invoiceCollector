@@ -1,3 +1,6 @@
 .idea/
 ui/node_modules/
 ui/.vscode/
+core/target/core-0.0.1.SNAPSHOT.jar
+core/target/
+*.iml

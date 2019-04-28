@@ -24,7 +24,7 @@ public class ApplicationJpa {
     }
 
     @Bean
-    public CommandLineRunner demo(CustomerRepository repository, CustomerEmailsRepository emailsRepository) {
+    public CommandLineRunner demojpa(CustomerRepository repository, CustomerEmailsRepository emailsRepository) {
         return (args) -> {
             // save a couple of customers
             Customer customer1 = repository.save(new Customer("Jack", "Bauer"));
