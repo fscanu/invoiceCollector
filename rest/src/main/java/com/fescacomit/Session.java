@@ -1,14 +1,14 @@
 package com.fescacomit;
 
-public class UserToSave {
+public class Session {
 
     private User user;
 
-    public UserToSave() {
+    public Session() {
         super();
     }
 
-    public UserToSave(User user) {
+    public Session(User user) {
         this.user = user;
     }
 

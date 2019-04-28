@@ -21,7 +21,11 @@ export default class headerComponent extends Component {
                     </li>
                     }
                     {user && <li className="nav-item">
-                        <a className="nav-link" href="#welcome">Welcome {user.username}</a>
+                        <a className="nav-link" href="#">Welcome {user.username}</a>
+                    </li>
+                    }
+                    {user && <li className="nav-item">
+                        <a className="nav-link" href="#linkgmail">Link my gmail account!</a>
                     </li>
                     }
                     {!user && <li className="nav-item">

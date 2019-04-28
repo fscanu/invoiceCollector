@@ -1,10 +1,8 @@
 package com.fescacomit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
@@ -20,26 +18,32 @@ public class ApiRestController {
                             String.format(template, name));
     }
 
+    @RequestMapping(value = "/users", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Session insertUser(@RequestBody User user) {
+        Session session = new Session();
+        session.setUser(user);
+        return session;
+
+    }
+
+    @RequestMapping(value = "/user/linkgmail", method = RequestMethod.POST)
+    public User linkgmail(@RequestBody User user) {
+        return user;
+    }
+
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public User user(@RequestBody UserToSave user) {
+    public User user(@RequestBody Session user) {
         return new User(user.getUser().getUsername(), user.getUser().getUsername(), "ddqsd", "dsqdqsd");
     }
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public User login(@RequestBody UserToSave user) {
+    public User login(@RequestBody Session user) {
         return new User(user.getUser().getUsername(), user.getUser().getUsername(), "ddqsd", "dsqdqsd");
 
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserToSave insertUser(@RequestBody String jsonString) throws IOException {
-        UserToSave user = new ObjectMapper().readValue(jsonString, UserToSave.class);
-        return user;
-
-    }
-
     @RequestMapping(value = "/user", method = RequestMethod.PUT)
-    public User saveUser(@RequestBody UserToSave user) {
+    public User saveUser(@RequestBody Session user) {
         return new User(user.getUser().getUsername(), user.getUser().getUsername(), "ddqsd", "dsqdqsd");
 
     }
