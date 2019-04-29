@@ -85,7 +85,8 @@ public class GmailApiServiceImplTest {
                     "Consultez ici votre aperçu",
                     TEST_LABEL,
                     USER_ID,
-                    MESSAGE_ID, MONTH_OFFSET);
+                    MESSAGE_ID,
+                    MONTH_OFFSET);
         } catch (LinkNotFoundException | DownloadException e) {
             e.printStackTrace();
         }
