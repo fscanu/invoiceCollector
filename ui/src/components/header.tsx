@@ -1,12 +1,14 @@
-import app, {Component, on} from 'apprun';
+import app, { Component, on } from 'apprun';
 
 export default class headerComponent extends Component {
     state = 'header';
 
     view = (state) => {
         const user = state.user;
+        const labels = state.labels;
         return <nav className="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-            <a className="navbar-brand" href="#">Top navbar</a>
+            {!user && <a className="nav-link" href="#">Top navbar</a>}
+            {user && <a className="nav-link" href="#">Welcome {user.username}</a>}
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
@@ -20,11 +22,11 @@ export default class headerComponent extends Component {
                         <a className="nav-link" href="#signin">SignIn</a>
                     </li>
                     }
-                    {user && <li className="nav-item">
-                        <a className="nav-link" href="#">Welcome {user.username}</a>
+                    {user && labels && <li className="nav-item">
+                        <a className="nav-link" href="#labels">Your gmail labels</a>
                     </li>
                     }
-                    {user && <li className="nav-item">
+                    {user && !labels && <li className="nav-item">
                         <a className="nav-link" href="#linkgmail">Link my gmail account!</a>
                     </li>
                     }
@@ -45,6 +47,7 @@ export default class headerComponent extends Component {
         '//': state => state,
     };
 
+    @on('/set-labels') setLabels = (state, labels) => ({ ...state, labels })
     @on('/set-user') setUser = (state, user) => ({ ...state, user })
 }
 

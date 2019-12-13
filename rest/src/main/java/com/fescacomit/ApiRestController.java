@@ -2,6 +2,7 @@ package com.fescacomit;
 
 import com.fescacomit.service.api.GmailApiService;
 import com.fescacomit.service.api.GmailApiServiceImpl;
+import com.fescacomit.service.exceptions.LabelsNotFoundException;
 import com.fescacomit.service.gmail.auth.GmailAuthorizationService;
 import com.fescacomit.service.gmail.auth.GmailAuthorizationServiceImpl;
 import com.fescacomit.service.gmail.constants.GmailConstants;
@@ -39,7 +40,7 @@ public class ApiRestController {
     @RequestMapping("/greeting")
     public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
         return new Greeting(counter.incrementAndGet(),
-                String.format(template, name));
+                            String.format(template, name));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -51,9 +52,9 @@ public class ApiRestController {
     }
 
     @RequestMapping(value = "/user/linkgmail", method = RequestMethod.POST)
-    public User linkgmail(@RequestBody User user) {
+    public List<Label> linkgmail(@RequestBody User user) throws LabelsNotFoundException {
         final List<Label> labels = apiService.fetchLabels(gmailService, GmailConstants.USER_ID);
-        return user;
+        return labels;
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)

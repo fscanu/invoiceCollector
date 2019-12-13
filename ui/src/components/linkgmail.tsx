@@ -32,9 +32,9 @@ export default class linkgmailComponent extends Component {
   @on('linkgmail') linkgmailaccount = async (state, e) => {
     try {
         e.preventDefault();
-        const session = await auth.linkgmail(serializeObject(e.target));
-
-        app.run('route', '#home');
+        const labels = await auth.linkgmail(serializeObject(e.target));
+        app.run('/set-labels', labels);
+        app.run('//', labels);
     } catch ({ errors }) {
         return { ...state, errors }
     }

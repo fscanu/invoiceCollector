@@ -1,6 +1,7 @@
 package com.fescacomit.service.api;
 
 import com.fescacomit.service.exceptions.DownloadException;
+import com.fescacomit.service.exceptions.LabelsNotFoundException;
 import com.fescacomit.service.exceptions.LinkNotFoundException;
 import com.fescacomit.service.gmail.messages.GmailMessageService;
 import com.fescacomit.service.gmail.utilties.Utilities;
@@ -23,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 import static com.fescacomit.service.gmail.constants.GmailConstants.ATTACHMENT_STORE_DIR;
 
@@ -53,10 +55,10 @@ public class GmailApiServiceImpl implements GmailApiService {
             String messageId,
             int monthOffset) throws LinkNotFoundException, DownloadException {
 
-        Message messageFull         = messageService.getMessage(service, userId, messageId);
-        String  hrefLinkByHrefValue = getHrefLinkByHrefValue(linkText, messageFull);
-        String  lastHrefRedirected  = followRedirects(hrefLinkByHrefValue);
-        String  localFilename       = createFilename(label, monthOffset, messageFull);
+        Message messageFull = messageService.getMessage(service, userId, messageId);
+        String hrefLinkByHrefValue = getHrefLinkByHrefValue(linkText, messageFull);
+        String lastHrefRedirected = followRedirects(hrefLinkByHrefValue);
+        String localFilename = createFilename(label, monthOffset, messageFull);
 
         utilities.downloadAttachment(lastHrefRedirected, localFilename);
     }
@@ -71,19 +73,22 @@ public class GmailApiServiceImpl implements GmailApiService {
      * @throws IOException
      */
     @Override
-    public List<Label> fetchLabels(Gmail service, String userId) {
-        List<Label> labels = new ArrayList<>();
+    public List<Label> fetchLabels(Gmail service, String userId) throws LabelsNotFoundException {
+        List<Label> labels;
+        List<Label> result = new ArrayList<>();
         try {
             //Service
             ListLabelsResponse response = service.users().labels().list(userId).execute();
             labels = response.getLabels();
+            Optional.ofNullable(labels).orElseThrow(() -> new LabelsNotFoundException("Labels not found"));
             for (Label label : labels) {
-                log.info(label.toPrettyString());
+                Optional.ofNullable(label.getType()).orElseThrow(() -> new LabelsNotFoundException("Label type not found"));
+                if (label.getType().equals("user")) result.add(label);
             }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-        return labels;
+        return result;
     }
 
     /**
@@ -110,7 +115,7 @@ public class GmailApiServiceImpl implements GmailApiService {
             if (response.getNextPageToken() != null) {
                 String pageToken = response.getNextPageToken();
                 response = service.users().messages().list(userId).setQ(query)
-                                  .setPageToken(pageToken).execute();
+                        .setPageToken(pageToken).execute();
             } else {
                 break;
             }
@@ -138,7 +143,7 @@ public class GmailApiServiceImpl implements GmailApiService {
                                                 List<String> labelIds)
             throws IOException {
         ListMessagesResponse response = service.users().messages().list(userId)
-                                               .setLabelIds(labelIds).execute();
+                .setLabelIds(labelIds).execute();
 
         List<Message> messages = new ArrayList<Message>();
         while (response.getMessages() != null) {
@@ -147,11 +152,11 @@ public class GmailApiServiceImpl implements GmailApiService {
                 String pageToken = response.getNextPageToken();
                 response =
                         service.users()
-                               .messages()
-                               .list(userId)
-                               .setLabelIds(labelIds)
-                               .setPageToken(pageToken)
-                               .execute();
+                                .messages()
+                                .list(userId)
+                                .setLabelIds(labelIds)
+                                .setPageToken(pageToken)
+                                .execute();
             } else {
                 break;
             }
@@ -183,10 +188,10 @@ public class GmailApiServiceImpl implements GmailApiService {
             List<String> labelIds) throws IOException {
 
         Gmail.Users.Messages.List list = service.users()
-                                                .messages()
-                                                .list(userId)
-                                                .setLabelIds(labelIds)
-                                                .setQ(query);
+                .messages()
+                .list(userId)
+                .setLabelIds(labelIds)
+                .setQ(query);
         ListMessagesResponse response = list.execute();
 
         List<Message> messages = new ArrayList<Message>();
@@ -195,8 +200,8 @@ public class GmailApiServiceImpl implements GmailApiService {
             if (response.getNextPageToken() != null) {
                 String pageToken = response.getNextPageToken();
                 response = list
-                                   .setPageToken(pageToken)
-                                   .execute();
+                        .setPageToken(pageToken)
+                        .execute();
             } else {
                 break;
             }
@@ -210,12 +215,12 @@ public class GmailApiServiceImpl implements GmailApiService {
     }
 
     private String getHrefLinkByHrefValue(String linkText, Message messageFull) throws LinkNotFoundException {
-        String   body     = extractBodyData(messageFull);
+        String body = extractBodyData(messageFull);
         Document document = Jsoup.parse(body);
-        Elements links    = document.select("a[href]");
+        Elements links = document.select("a[href]");
 
         linksNotEmptyCheck(linkText, links);
-        String  href      = null;
+        String href = null;
         Boolean linkFound = Boolean.FALSE;
         for (Element link : links) {
 
@@ -233,20 +238,20 @@ public class GmailApiServiceImpl implements GmailApiService {
     private void linkFoundCheck(Boolean linkFound, String linkText) throws LinkNotFoundException {
         if (!linkFound) {
             throw new LinkNotFoundException(String.format("There are links but none of them matches the criteria: %s",
-                                                          linkText));
+                    linkText));
         }
     }
 
     private void linksNotEmptyCheck(String linkText, Elements links) throws LinkNotFoundException {
         if (links.isEmpty()) {
             throw new LinkNotFoundException(String.format("The link %s was not found in the message, there are no links",
-                                                          linkText));
+                    linkText));
         }
     }
 
     private String createFilename(String label, int monthOffset, Message messageFull) {
-        Long     internalDate = messageFull.getInternalDate();
-        Calendar messageDate  = Calendar.getInstance();
+        Long internalDate = messageFull.getInternalDate();
+        Calendar messageDate = Calendar.getInstance();
         messageDate.setTimeInMillis(internalDate);
         messageDate.add(Calendar.MONTH, monthOffset);
         int month =
@@ -255,22 +260,22 @@ public class GmailApiServiceImpl implements GmailApiService {
         String
                 monthFormatted =
                 month < 10
-                ? "0".concat(String.valueOf(month))
-                : String.valueOf(month);
+                        ? "0".concat(String.valueOf(month))
+                        : String.valueOf(month);
         String formattedDate = "" + year + monthFormatted;
         return ATTACHMENT_STORE_DIR + File.separator + label + " " + formattedDate + ".pdf";
     }
 
     private String extractBodyData(Message messageFull) {
         String body = StringUtils.newStringUtf8(Base64.decodeBase64(messageFull.getPayload()
-                                                                               .getBody()
-                                                                               .getData()));
+                .getBody()
+                .getData()));
         if (body == null) {
             body = "";
             List<MessagePart> parts = messageFull.getPayload().getParts();
             for (MessagePart part : parts) {
                 Base64 base64Url = new Base64(true);
-                byte[] data      = Base64.decodeBase64(part.getBody().getData());
+                byte[] data = Base64.decodeBase64(part.getBody().getData());
                 body += data != null ? body.concat(StringUtils.newStringUtf8(data)) : "";
             }
         }

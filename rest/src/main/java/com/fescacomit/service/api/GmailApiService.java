@@ -1,6 +1,7 @@
 package com.fescacomit.service.api;
 
 import com.fescacomit.service.exceptions.DownloadException;
+import com.fescacomit.service.exceptions.LabelsNotFoundException;
 import com.fescacomit.service.exceptions.LinkNotFoundException;
 import com.fescacomit.service.gmail.messages.GmailMessageService;
 import com.fescacomit.service.gmail.utilties.Utilities;
@@ -31,7 +32,7 @@ public interface GmailApiService {
                                  int monthOffset) throws LinkNotFoundException, DownloadException;
 
     List<Label> fetchLabels(Gmail service,
-                            String userId);
+                            String userId) throws LabelsNotFoundException;
 
     List<Message> listMessagesWithLabels(Gmail service,
                                          String userId,

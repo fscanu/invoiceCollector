@@ -5,6 +5,7 @@ import signin from './components/signin';
 import signup from './components/signup';
 import header from './components/header';
 import linkgmail from './components/linkgmail';
+import labels from './components/labels';
 //mounting the header in the div inside the html
 const index_header = document.getElementById('header');
 new header().mount(index_header);
@@ -15,6 +16,7 @@ new home().mount(element);
 new signin().mount(element);
 new signup().mount(element);
 new linkgmail().mount(element);
+new labels().mount(element);
 
 app.on('//', route => {
     const menus = document.querySelectorAll('.nav li');
