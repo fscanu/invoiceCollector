@@ -13,8 +13,6 @@ export default class linkgmailComponent extends Component {
             <div class="card-body">
               <h5 class="card-title text-center">Gmail</h5>
               <form class="form-signin" onsubmit={e => this.run('linkgmail', e)}>
-
-
                 <div class="form-label-group">
                   <input type="email" id="email" class="form-control" placeholder="Email address" required />
                   <label for="email">Email address</label>

@@ -4,8 +4,8 @@
 }
 
 body {
-  background: #007bff;
-  background: linear-gradient(to right, rgb(245, 82, 82), rgb(240, 234, 234));
+  /*background: #007bff;*/
+  /*background: linear-gradient(to right, rgb(245, 82, 82), rgb(240, 234, 234));*/
 }
 
 .card-signin {
@@ -24,10 +24,10 @@ body {
 .card-signin .card-img-left {
   width: 45%;
   opacity: 0.5;
-  background: scroll center url('../resources/imgs/logo_size_icon.jpg'); 
-  background-size: 90%; 
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: 90%;
+  /* Center the image */
+  /* Do not repeat the image */
+  background: url('../resources/imgs/logo_size_icon.jpg') no-repeat scroll center;
 }
 
 .card-signin .card-body {
